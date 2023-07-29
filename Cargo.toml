@@ -9,5 +9,5 @@ edition = "2021"
 env_logger = "0.10.0"
 log = "0.4.19"
 pollster = "0.3.0"
-wgpu = "0.17.0"
+wgpu = { version = "0.17.0", features = ["spirv"] }
 winit = "0.28.6"

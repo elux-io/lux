@@ -1,0 +1,37 @@
+[nzsl_version("1.0")]
+module;
+
+struct VertexInput
+{
+	[builtin(vertex_index)] vertex_index: i32
+}
+
+struct VertexOutput
+{
+    [builtin(position)] clip_position: vec4[f32]
+}
+
+[entry(vert)]
+fn main(input: VertexInput) -> VertexOutput
+{
+    let out: VertexOutput;
+    let x = f32(1 - input.vertex_index) * 0.5;
+    let y = f32((input.vertex_index % 2) * 2 - 1) * 0.5;
+    out.clip_position = vec4[f32](x, y, 0.0, 1.0);
+
+    return out;
+}
+
+struct FragOutput
+{
+    [location(0)] color: vec4[f32]
+}
+
+[entry(frag)]
+fn main(input: VertexOutput) -> FragOutput
+{
+    let out: FragOutput;
+    out.color = vec4[f32](0.8, 0.1, 0.2, 1.0);
+
+    return out;
+}
