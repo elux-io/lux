@@ -1,0 +1,15 @@
+[package]
+name = "app"
+version = "0.0.0"
+edition = "2021"
+
+[dependencies]
+bytemuck = { version = "1.13.1", features = ["derive"] }
+env_logger = "0.10.0"
+glam = "0.24.1"
+log = "0.4.19"
+lux = { path = ".." }
+pollster = "0.3.0"
+rand = "0.8.5"
+wgpu = { version = "0.17.0", features = ["spirv"] }
+winit = "0.28.6"

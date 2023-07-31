@@ -3,7 +3,7 @@ use std::process::Command;
 fn main() {
     let out_dir = std::env::var("OUT_DIR").unwrap();
 
-    let output = Command::new("./nzslc")
+    let output = Command::new("../nzslc")
         .args(&[
             "src/shader.nzsl",
             &format!("--output={}", out_dir),
