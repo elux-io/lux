@@ -1,10 +1,13 @@
 use std::f32::consts::TAU;
 
 use glam::{Mat4, Quat, Vec3};
+use lux::App as _;
+use lux_derive::HotReload;
 use rand::Rng;
 use wgpu::{include_spirv, util::DeviceExt};
 use winit::{dpi::PhysicalSize, window::Window};
 
+#[derive(HotReload)]
 pub struct App {
     render_device: RenderDevice,
     size: winit::dpi::PhysicalSize<u32>,
@@ -123,7 +126,7 @@ impl lux::App for App {
                     * Quat::from_rotation_y(rng.gen_range(0.01..0.03)),
             })
             .collect();
-	
+
         compute_target_positions(&mut cubes);
 
         let instance_data_size = 16 * 4;

@@ -6,6 +6,8 @@ edition = "2021"
 [workspace]
 members = [
     "app",
+    "app_runner",
+    "lux_derive",
 ]
 
 [dependencies]
