@@ -3,21 +3,37 @@ module;
 
 struct VertexInput
 {
-	[builtin(vertex_index)] vertex_index: i32
+	[location(0)] position: vec3[f32],
+    [location(1)] normal: vec3[f32],
+    [location(2)] modelMatrix0: vec4[f32],
+    [location(3)] modelMatrix1: vec4[f32],
+    [location(4)] modelMatrix2: vec4[f32],
+    [location(5)] modelMatrix3: vec4[f32]
 }
 
 struct VertexOutput
 {
-    [builtin(position)] clip_position: vec4[f32]
+    [builtin(position)] position: vec4[f32],
+    [location(0)] normalViewSpace: vec3[f32]
+}
+
+struct Camera
+{
+    viewProjMatrix: mat4[f32]
+}
+
+external
+{
+    [set(0), binding(0)] camera: uniform[Camera],
 }
 
 [entry(vert)]
 fn main(input: VertexInput) -> VertexOutput
 {
+    let modelMatrix = mat4[f32](input.modelMatrix0, input.modelMatrix1, input.modelMatrix2, input.modelMatrix3);
     let out: VertexOutput;
-    let x = f32(1 - input.vertex_index) * 0.5;
-    let y = f32((input.vertex_index % 2) * 2 - 1) * 0.5;
-    out.clip_position = vec4[f32](x, y, 0.0, 1.0);
+    out.position = camera.viewProjMatrix * modelMatrix * vec4[f32](input.position, 1.0);
+    out.normalViewSpace = (camera.viewProjMatrix * modelMatrix * vec4[f32](input.normal, 0.0)).xyz;
 
     return out;
 }
@@ -30,8 +46,14 @@ struct FragOutput
 [entry(frag)]
 fn main(input: VertexOutput) -> FragOutput
 {
+    let ambientColor = vec3[f32](0.15, 0.15, 0.15);
+    let diffuseColor = vec3[f32](0.2, 0.1, 0.99);
+    let lightDir = normalize(vec3[f32](1.0, 1.0, -1.0));
+    let diffuseStrength = max(dot(normalize(input.normalViewSpace), lightDir), 0.0);
+    let color = (ambientColor + vec3[f32](diffuseStrength, diffuseStrength, diffuseStrength)) * diffuseColor;
+
     let out: FragOutput;
-    out.color = vec4[f32](0.8, 0.1, 0.2, 1.0);
+    out.color = vec4[f32](color, 1.0);
 
     return out;
 }
