@@ -1,0 +1,68 @@
+[nzsl_version("1.0")]
+module;
+
+import Light from Common;
+import Camera from Common;
+
+struct VertexInput
+{
+    [location(0)] pos: vec3[f32],
+    [location(1)] normal: vec3[f32],
+    [location(2)] modelMatrix0: vec4[f32],
+    [location(3)] modelMatrix1: vec4[f32],
+    [location(4)] modelMatrix2: vec4[f32],
+    [location(5)] modelMatrix3: vec4[f32]
+}
+
+struct VertexOutput
+{
+    [builtin(position)] pos: vec4[f32],
+    [location(1)] normalWorldSpace: vec3[f32],
+    [location(2)] posWorld: vec3[f32]
+}
+
+external
+{
+    [set(0), binding(0)] camera: uniform[Camera],
+    [set(1), binding(0)] light: uniform[Light]
+}
+
+[entry(vert)]
+fn vs_main(input: VertexInput) -> VertexOutput
+{
+    let modelMatrix = mat4[f32](input.modelMatrix0, input.modelMatrix1, input.modelMatrix2, input.modelMatrix3);
+
+    let out: VertexOutput;
+    out.pos = camera.viewProjMatrix * modelMatrix * vec4[f32](input.pos.xyz, 1.0);
+    out.posWorld = (modelMatrix * vec4[f32](input.pos.xyz, 1.0)).xyz;
+    out.normalWorldSpace = (modelMatrix * vec4[f32](input.normal.xyz, 0.0)).xyz;
+
+    return out;
+}
+
+struct FragOut
+{
+    [location(0)] color: vec4[f32]
+}
+
+[entry(frag)]
+fn fs_main(input: VertexOutput) -> FragOut
+{
+    let objectColor = vec3[f32](0.2, 0.1, 0.99);
+
+    let n = normalize(input.normalWorldSpace);
+    let l = normalize(light.pos - input.posWorld);
+    let v = normalize(camera.pos - input.posWorld);
+    let h = normalize(l + v);
+
+    let ambient = 0.1;
+    let diffuse = max(dot(n, l), 0.0);
+    let specular = pow(max(dot(n, h), 0.0), 256.0);
+
+    let color = (ambient + diffuse + specular) * light.color * objectColor;
+
+    let out: FragOut;
+    out.color = vec4[f32](color.rgb, 1.0);
+
+    return out;
+}
